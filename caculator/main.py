@@ -1,27 +1,34 @@
 # on cree une calculatrice basique avec tkinter
 # hyper basique, 4 columns 5 rows
-import tkinter as tk
+from tkinter import Tk, Button, Label, Frame
 
-class App(tk.Frame):
-    def __init__(self, master):
-        super().__init__(master)
+class MyWindow(Tk):
+    
+    def __init__(self):
+        # super init
+        super().__init__()
         
-        self.pack()
+        # container en haut a gauche
+        left_container = Frame(self, width=150, height=200)
+        left_container.place(x=0, y=0)
         
-        self.entrythingy = tk.Entry()
-        self.entrythingy.pack()
+        first_label = Label(left_container, text='Label (10, 10)', fg='white', bg='#FF00FF')
+        first_label.place(x=10, y=10)
         
-        self.contents = tk.StringVar()
-        self.contents.set("contenu de la variable")
-        self.entrythingy["textvariable"] = self.contents
+        second_label = Label(left_container, text='Label (50, 50)', fg='white', bg='green')
+        second_label.place(x=50, y=50)
         
-        self.entrythingy.bind('<Key-Return>',
-                              self.print_contents)
+        # container de droite
+        right_container = Frame(self, width=150, height=200, relief='raised', borderwidth=5)
+        right_container.place(x=150, y=0)
         
-    def print_contents(self, event):
-        print("Contenu actuel :",
-              self.contents.get())
+        button = Button(right_container, text='Button (10, 10)')
+        button.place(x=10, y=10)
         
-root = tk.Tk()
-app = App(root)
-app.mainloop()
+        self.geometry('300x200')
+        self.title('Hello workd!')    
+        
+
+
+window = MyWindow()
+window.mainloop()
