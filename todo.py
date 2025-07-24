@@ -1,4 +1,6 @@
 import flet as ft
+import os
+import json
 
 
 class TodoApp(ft.Column):
@@ -48,6 +50,42 @@ class TodoApp(ft.Column):
                 ],
             ),
         ]
+        # charge la liste de taches depuis le fichier de sauvegarde
+        self.load_tasks()
+    
+    def load_tasks(self):
+        """Charger les tâches depuis tasks.json si le fichier existe."""
+        try:
+            if os.path.exists("tasks.json"):
+                with open("tasks.json", "r") as f:
+                    tasks_data = json.load(f)
+                    for task_data in tasks_data:
+                        task = Task(
+                            task_name=task_data["name"],
+                            task_status_change=self.task_status_change,
+                            task_delete=self.task_delete
+                        )
+                        task.completed = task_data.get("completed", False)
+                        task.display_task.value = task_data.get("completed", False)
+                        self.tasks.controls.append(task)
+        except json.JSONDecodeError:
+            print("Erreur : Fichier JSON corrompu. Démarrage avec une liste vide.")
+            
+    def save_tasks(self):
+        """Sauvegarder les tâches dans tasks.json."""
+        tasks_data = [
+            {"name": task.display_task.label, "completed": task.completed}
+            for task in self.tasks.controls
+        ]
+        with open("tasks.json", "w") as f:
+            json.dump(tasks_data, f, indent=2)
+
+    def update(self):
+        """Surcharge de la méthode update pour sauvegarder après chaque mise à jour."""
+        self.before_update()
+        super().update()
+        self.save_tasks() 
+    
         
     def clear_clicked(self, e):
         for task in self.tasks.controls[:]:
@@ -70,7 +108,7 @@ class TodoApp(ft.Column):
     def tabs_changed(self, e):
         self.update()
 
-    def task_status_change(self, e):
+    def task_status_change(self):
         self.update()
                 
     def add_clicked(self, e):
