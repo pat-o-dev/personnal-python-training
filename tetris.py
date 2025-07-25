@@ -5,6 +5,8 @@ import random
 pygame.init()
 pygame.font.init()
 
+DEBUG_MODE = True
+
 # liste des couleurs
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -36,34 +38,50 @@ SHAPE_SR = [(0,0), (0,1), (1,1), (1,2)]
 
 SHAPES = [SHAPE_L, SHAPE_LR, SHAPE_T, SHAPE_I, SHAPE_O, SHAPE_S, SHAPE_SR]
 
-SPAWN_X, SPAWN_Y = 3, 3
+SPAWN = pygame.Vector2(4, -3)
 
+CONTROL_PAUSE = [pygame.K_ESCAPE, pygame.K_p]
+CONTROL_QUIT = [pygame.K_x, pygame.K_DELETE]
+CONTROL_LEFT = [pygame.K_a, pygame.K_LEFT]
+CONTROL_RIGHT = [pygame.K_d, pygame.K_RIGHT]
+CONTROL_DOWN = [pygame.K_s, pygame.K_DOWN]
+CONTROL_NEW = [pygame.K_n]
+
+def get_shape():
+    return random.choice(SHAPES), pygame.Vector2(SPAWN.x, SPAWN.y)
+        
 def main():
     clock = pygame.time.Clock()
     running = True
     pause = False
-    shape = random.choice(SHAPES)
-    shape_position = pygame.Vector2(SPAWN_X, SPAWN_Y)
+    # init de la piece
+    shape, shape_position = get_shape()
+    # timer descente piece 
+    move_down_timer = 0
+    move_down_interval = 500
     while running:
+        shape_movement = pygame.Vector2(0, 0)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
+                key = event.key
                 # press X or DELETE pour quit
-                if event.key in (pygame.K_x, pygame.K_DELETE):
+                if key in CONTROL_PAUSE:
                     running = False
                 # press ESCAPE pour pause
-                if event.key in (pygame.K_ESCAPE, pygame.K_p):
+                if key in CONTROL_QUIT:
                     pause = not pause
-                if event.key == pygame.K_s:
-                    shape = random.choice(SHAPES)
-                    shape_position = pygame.Vector2(SPAWN_X, SPAWN_Y)
-                if event.key in (pygame.K_a, pygame.K_LEFT):
-                    shape_position.x -= 1
-                if event.key in (pygame.K_d, pygame.K_RIGHT):
-                    shape_position.x += 1
-                if event.key in (pygame.K_s, pygame.K_DOWN):
-                    shape_position.y += 1
+                # pour debug, charge une nouvelle piece
+                if key in CONTROL_NEW and DEBUG_MODE:
+                    shape, shape_position = get_shape()
+                # deplacement piece
+                if key in CONTROL_LEFT:
+                    shape_movement.x -= 1
+                if key in CONTROL_RIGHT:
+                    shape_movement.x += 1
+                if key in CONTROL_DOWN:
+                    shape_movement.y += 1
                 
         # couleur fond
         screen.fill(BLACK)
@@ -72,9 +90,24 @@ def main():
         if pause == True:
             screen.blit(TEXT_PAUSE, ((WINDOW_WIDTH - TEXT_PAUSE.get_width()) / 2,(WINDOW_HEIGHT - TEXT_PAUSE.get_height()) / 2))
         
-        # affiche une grille des cases    
-        pygame.draw.rect(screen, WHITE, (0,0,BLOC_SIZE, BLOC_SIZE), 1)
+        # affiche une grille des cases 
+        for grid_x in range(GRID_WIDTH):
+            for grid_y in range(GRID_HEIGHT):
+                pos_x = grid_x * BLOC_SIZE
+                pos_y = grid_y * BLOC_SIZE
+                pygame.draw.rect(screen, WHITE, (pos_x, pos_y, pos_x + BLOC_SIZE, pos_y + BLOC_SIZE), 1)
         
+        # recupere le temps passe - change selon le FPS reel
+        # mise a jour de la position
+        if pause == False:
+            # todo modifier calcul timer en tenant compte de la pause
+            move_down_timer += clock.get_time()
+            if move_down_timer > move_down_interval:
+                move_down_timer = 0
+                shape_movement.y += 1
+        
+            shape_position += shape_movement
+            
         for dx, dy in shape:
             pygame.draw.rect(
                 screen,
@@ -86,7 +119,7 @@ def main():
         pygame.display.flip()
         # 60 fps
         clock.tick(60)
-    
+        
     pygame.quit()
 
 # init window
