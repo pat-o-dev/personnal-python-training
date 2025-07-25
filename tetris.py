@@ -33,13 +33,39 @@ WINDOW_WIDTH = GRID_WIDTH * BLOC_SIZE
 WINDOW_HEIGHT = GRID_HEIGHT * BLOC_SIZE
 
 # liste des formes
-SHAPE_L = [(0,0), (0,1), (0,2), (1,2)]
-SHAPE_LR = [(0,0), (0,1), (0,2), (1,0)]
-SHAPE_T = [(0,1), (1,0), (1,1), (1,2)]
-SHAPE_I = [(0,0), (1,0), (2,0), (3,0)]
+SHAPE_L = [
+    [(0,0), (0,1), (0,2), (1,2)], # 0 0deg
+    [(0,0), (0,1), (1,0), (2,0)], # 1 90deg
+    [(0,0), (1,0), (1,1), (1,2)], # 2 180deg
+    [(2,0), (0,1), (1,1), (2,1)], # 3 270deg
+    ]
+SHAPE_LR = [
+    [(1,0), (1,1), (1,2), (0,2)],   # 0
+    [(0,0), (0,1), (1,1), (2,1)],   # 90
+    [(0,0), (1,0), (0,1), (0,2)],   # 180
+    [(0,0), (1,0), (2,0), (2,1)],   # 270
+]
+SHAPE_T = [
+    [(0,1), (1,0), (1,1), (1,2)],   # 0
+    [(0,0), (1,0), (1,1), (2,0)],   # 90
+    [(1,0), (1,1), (1,2), (2,1)],   # 180
+    [(0,1), (1,0), (1,1), (2,1)],   # 270
+]
+SHAPE_I = [
+    [(0,0), (1,0), (2,0), (3,0)],   # 0
+    [(1,-1), (1,0), (1,1), (1,2)],  # 90
+    [(0,1), (1,1), (2,1), (3,1)],   # 180
+    [(2,-1), (2,0), (2,1), (2,2)],  # 270
+]
 SHAPE_O = [(0,0), (0,1), (1,0), (1,1)]
-SHAPE_S = [(0,1), (0,2), (1,0), (1,1)]
-SHAPE_SR = [(0,0), (0,1), (1,1), (1,2)]
+SHAPE_S = [
+    [(0,1), (0,2), (1,0), (1,1)],   # 0
+    [(0,0), (1,0), (1,1), (2,1)],   # 90
+]
+SHAPE_SR = [
+    [(0,0), (0,1), (1,1), (1,2)],   # 0
+    [(0,1), (1,0), (1,1), (2,0)],   # 90
+]
 
 SHAPES = [SHAPE_L, SHAPE_LR, SHAPE_T, SHAPE_I, SHAPE_O, SHAPE_S, SHAPE_SR]
 
@@ -52,20 +78,12 @@ CONTROL_QUIT = [pygame.K_x, pygame.K_DELETE]
 CONTROL_LEFT = [pygame.K_a, pygame.K_LEFT]
 CONTROL_RIGHT = [pygame.K_d, pygame.K_RIGHT]
 CONTROL_DOWN = [pygame.K_s, pygame.K_DOWN]
+CONTROL_ROTATE = [pygame.K_r, pygame.K_UP]
 CONTROL_NEW = [pygame.K_n]
    
-def draw_grid():
-    for grid_x in range(GRID_WIDTH):
-        for grid_y in range(GRID_HEIGHT):
-            pos_x = grid_x * BLOC_SIZE
-            pos_y = grid_y * BLOC_SIZE
-            pygame.draw.rect(screen, WHITE, (pos_x, pos_y, pos_x + BLOC_SIZE, pos_y + BLOC_SIZE), 1)
-
-def draw_pause():
-    screen.blit(TEXT_PAUSE, ((WINDOW_WIDTH - TEXT_PAUSE.get_width()) / 2,(WINDOW_HEIGHT - TEXT_PAUSE.get_height()) / 2))
-
 class Piece:
     def __init__(self, force_shape=None):
+        self.rotation = 0
         if force_shape == None:
             self.shape = random.choice(SHAPES)
         elif force_shape in SHAPES:
@@ -75,11 +93,16 @@ class Piece:
         self.position = pygame.Vector2(SPAWN.x, SPAWN.y)
         self.color = random.choice(COLORS)
     
+    def rotate(self):
+        self.rotation += 1
+        if self.rotation >= len(self.shape):
+            self.rotation = 0
+    
     def move(self, movement):
         self.position += pygame.Vector2(movement.x, movement.y)
         
     def draw(self):
-        for dx, dy in self.shape:
+        for dx, dy in self.shape[self.rotation]:
             pygame.draw.rect(
                 screen,
                 self.color,
@@ -92,6 +115,7 @@ class Tetris:
         self.pause = False
         self.piece = Piece()
         self.piece_movement = pygame.Vector2()
+        self.rotate = False
         self.move_down_timer = 0
         self.move_down_interval = 500 #ms
     
@@ -117,6 +141,8 @@ class Tetris:
                     self.piece_movement.x += 1
                 if key in CONTROL_DOWN:
                     self.piece_movement.y += 1
+                if key in CONTROL_ROTATE:
+                    self.rotate = True
     
     def update(self, delta):
         if self.pause == False:
@@ -125,16 +151,30 @@ class Tetris:
                 self.move_down_timer = 0
                 self.piece_movement.y += 1
             self.piece.move(self.piece_movement)  # mise a jour de la position
+            if self.rotate:
+                self.piece.rotate()
         self.piece_movement = pygame.Vector2(0, 0)
+        self.rotate = False
     
     def draw(self):
         screen.fill(BLACK) # couleur fond
         self.piece.draw() # affiche la piece
         if DEBUG_MODE:
-            draw_grid() # affiche une grille des cases               
+            self.draw_grid() # affiche une grille des cases               
         if self.pause == True:
-            draw_pause() # affiche la pause
+            self.draw_pause() # affiche la pause
         pygame.display.flip() # mise a jour rendu
+        
+    def draw_grid(self):
+        for grid_x in range(GRID_WIDTH):
+            for grid_y in range(GRID_HEIGHT):
+                pos_x = grid_x * BLOC_SIZE
+                pos_y = grid_y * BLOC_SIZE
+                pygame.draw.rect(screen, WHITE, (pos_x, pos_y, pos_x + BLOC_SIZE, pos_y + BLOC_SIZE), 1)
+
+    def draw_pause(self):
+        screen.blit(TEXT_PAUSE, ((WINDOW_WIDTH - TEXT_PAUSE.get_width()) / 2,(WINDOW_HEIGHT - TEXT_PAUSE.get_height()) / 2))
+
 
 def main():
     clock = pygame.time.Clock()
