@@ -98,8 +98,18 @@ class Piece:
         if self.rotation >= len(self.shape):
             self.rotation = 0
     
+    def is_valid_position(self, movement):
+        for dx, dy in self.shape[self.rotation]:
+            x = int(self.position.x + dx + movement.x)
+            y = int(self.position.y + dy + movement.y)
+            if x < 0 or x >= GRID_WIDTH or y >= GRID_HEIGHT:
+                return False
+        return True
+
+
     def move(self, movement):
-        self.position += pygame.Vector2(movement.x, movement.y)
+        if self.is_valid_position(movement):
+            self.position += pygame.Vector2(movement.x, movement.y)
         
     def draw(self):
         for dx, dy in self.shape[self.rotation]:

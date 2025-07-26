@@ -6,7 +6,7 @@ Believe in the future, just do it
 > python -m venv .venv #environement virtuel pour eviter de crash le systeme
 
 # todo.py
-Totu de Flet
+Tuto de Flet
 https://flet.dev/docs/tutorials/python-todo#final-touches
 Ajout de la sauvegarde des taches dans un json
 
