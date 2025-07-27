@@ -38,7 +38,7 @@ SHAPE_L = [
     [(0,0), (0,1), (1,0), (2,0)], # 1 90deg
     [(0,0), (1,0), (1,1), (1,2)], # 2 180deg
     [(2,0), (0,1), (1,1), (2,1)], # 3 270deg
-    ]
+]
 SHAPE_LR = [
     [(1,0), (1,1), (1,2), (0,2)],   # 0
     [(0,0), (0,1), (1,1), (2,1)],   # 90
@@ -57,8 +57,12 @@ SHAPE_I = [
     [(0,1), (1,1), (2,1), (3,1)],   # 180
     [(2,-1), (2,0), (2,1), (2,2)],  # 270
 ]
-SHAPE_O = [(0,0), (0,1), (1,0), (1,1)]
+SHAPE_O = [
+    [(0,0), (0,1), (1,0), (1,1)],
+]
 SHAPE_S = [
+    [(0,1), (0,2), (1,0), (1,1)],   # 0
+    [(0,0), (1,0), (1,1), (2,1)],   # 90
     [(0,1), (0,2), (1,0), (1,1)],   # 0
     [(0,0), (1,0), (1,1), (2,1)],   # 90
 ]
@@ -84,6 +88,7 @@ CONTROL_NEW = [pygame.K_n]
 class Piece:
     def __init__(self, force_shape=None):
         self.rotation = 0
+        self.on_the_floor = False
         if force_shape == None:
             self.shape = random.choice(SHAPES)
         elif force_shape in SHAPES:
@@ -102,7 +107,11 @@ class Piece:
         for dx, dy in self.shape[self.rotation]:
             x = int(self.position.x + dx + movement.x)
             y = int(self.position.y + dy + movement.y)
-            if x < 0 or x >= GRID_WIDTH or y >= GRID_HEIGHT:
+            if x < 0 or x >= GRID_WIDTH: # largeur
+                return False
+            if y >= GRID_HEIGHT: # touche le sol ou une autre piece en axe y, au second tic, on verouille la piece et on envoi une nouvelle
+                print('on the floor')
+                self.on_the_floor = True
                 return False
         return True
 
@@ -160,9 +169,18 @@ class Tetris:
             if self.move_down_timer > self.move_down_interval:
                 self.move_down_timer = 0
                 self.piece_movement.y += 1
-            self.piece.move(self.piece_movement)  # mise a jour de la position
-            if self.rotate:
-                self.piece.rotate()
+            if self.piece.on_the_floor and self.piece_movement.y > 0: # si la piece est au sol et que un tick ou le control down a ete press, on verouille la piece
+                # TODO gestion deplacement extremis, disable on the floor
+                # TODO extremis rotate
+                # TODO enregistrement de l emplacement dans la grille
+                # TODO check les Tetris
+                # TODO check GameOver
+                # TODO nouvelle piece
+                self.piece = Piece()
+            else:
+                self.piece.move(self.piece_movement)  # mise a jour de la position
+                if self.rotate:
+                    self.piece.rotate()
         self.piece_movement = pygame.Vector2(0, 0)
         self.rotate = False
     
