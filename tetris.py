@@ -51,9 +51,9 @@ SHAPE_T = [
 ]
 SHAPE_I = [
     [(0,0), (1,0), (2,0), (3,0)],   # 0
-    [(1,-1), (1,0), (1,1), (1,2)],  # 90
+    [(1,0), (1,1), (1,2), (1,3)],  # 90
     [(0,1), (1,1), (2,1), (3,1)],   # 180
-    [(2,-1), (2,0), (2,1), (2,2)],  # 270
+    [(2,0), (2,1), (2,2), (2,3)],  # 270
 ]
 SHAPE_O = [
     [(0,0), (0,1), (1,0), (1,1)],
@@ -129,9 +129,6 @@ class Piece:
         for dx, dy in self.shape[self.rotation]:
             x = int(self.position.x + dx + movement.x)
             y = int(self.position.y + dy + movement.y)
-            print(f"position: {x} {y}")
-            print(f"current row: {grid[x]}")
-            
             if x < 0 or x >= GRID_WIDTH: # largeur
                 return False
             elif y >= GRID_HEIGHT: # touche le sol ou une autre piece en axe y, au second tic, on verouille la piece et on envoi une nouvelle
@@ -171,16 +168,12 @@ class Tetris:
                 self.running = False
             if event.type == pygame.KEYDOWN:
                 key = event.key
-                # press X or DELETE pour quit
-                if key in CONTROL_QUIT:
+                if key in CONTROL_QUIT:# press X or DELETE pour quit
                     self.running = False
-                # press ESCAPE pour pause
-                if key in CONTROL_PAUSE:
+                if key in CONTROL_PAUSE:# press ESCAPE pour pause
                     self.pause = not self.pause
-                # pour debug, charge une nouvelle piece
-                if key in CONTROL_NEW and DEBUG_MODE:
+                if key in CONTROL_NEW and DEBUG_MODE:# pour debug, charge une nouvelle piece
                     self.piece = Piece()
-                # deplacement piece
                 if key in CONTROL_LEFT:
                     self.piece_movement.x -= 1
                 if key in CONTROL_RIGHT:
@@ -199,12 +192,10 @@ class Tetris:
             if self.piece.on_the_floor and self.piece_movement.y > 0: # si la piece est au sol et que un tick ou le control down a ete press, on verouille la piece
                 # TODO gestion deplacement extremis, disable on the floor
                 # TODO extremis rotate
-                # TODO enregistrement de l emplacement dans la grille
-                self.grid.update(self.piece)
+                self.grid.update(self.piece) # enregistrement de l emplacement dans la grille
                 # TODO check les Tetris
                 # TODO check GameOver
-                # TODO nouvelle piece
-                self.piece = Piece()
+                self.piece = Piece() # nouvelle piece
             else:
                 if self.piece.is_valid_position(self.grid.grid, self.piece_movement):
                     self.piece.move(self.piece_movement)  # mise a jour de la position
