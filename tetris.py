@@ -17,7 +17,7 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
-COLORS = [RED, BLUE, GREEN]
+
 
 # liste des textes
 FONT_SIZE = 30
@@ -72,7 +72,7 @@ SHAPE_SR = [
 ]
 
 SHAPES = [SHAPE_L, SHAPE_LR, SHAPE_T, SHAPE_I, SHAPE_O, SHAPE_S, SHAPE_SR]
-
+SHAPES_COLORS = [RED, BLUE, GREEN]
 # position depart nouvelle piece
 SPAWN = pygame.Vector2(4, -3)
 
@@ -85,6 +85,30 @@ CONTROL_DOWN = [pygame.K_s, pygame.K_DOWN]
 CONTROL_ROTATE = [pygame.K_r, pygame.K_UP]
 CONTROL_NEW = [pygame.K_n]
    
+class Grid:
+    def __init__(self):
+        # enregistre la grille None ou Code Couleur
+        self.grid = []
+        rows, cols = (GRID_WIDTH, GRID_HEIGHT)
+        for i in range(rows):
+            self.grid.append([None]*cols)
+    
+    def update(self, piece):
+        pos_x = piece.position.x
+        pos_y = piece.position.y
+        for dx, dy in piece.shape[piece.rotation]:
+            id_x = int(pos_x + dx)
+            id_y = int(pos_y + dy)
+            self.grid[id_x][id_y] = piece.color
+    
+    def draw(self):
+        for x, row in enumerate(self.grid):
+            for y, value in enumerate(row):
+                if value != None:
+                    pos_x = x * BLOC_SIZE
+                    pos_y = y * BLOC_SIZE
+                    pygame.draw.rect(screen, value, (pos_x, pos_y, BLOC_SIZE, BLOC_SIZE))
+   
 class Piece:
     def __init__(self, force_shape=None):
         self.rotation = 0
@@ -96,7 +120,7 @@ class Piece:
         else:
             raise ValueError("Error: Shape not exist.") 
         self.position = pygame.Vector2(SPAWN.x, SPAWN.y)
-        self.color = random.choice(COLORS)
+        self.color = random.choice(SHAPES_COLORS)
     
     def rotate(self):
         self.rotation += 1
@@ -110,11 +134,9 @@ class Piece:
             if x < 0 or x >= GRID_WIDTH: # largeur
                 return False
             if y >= GRID_HEIGHT: # touche le sol ou une autre piece en axe y, au second tic, on verouille la piece et on envoi une nouvelle
-                print('on the floor')
                 self.on_the_floor = True
                 return False
         return True
-
 
     def move(self, movement):
         if self.is_valid_position(movement):
@@ -132,6 +154,7 @@ class Tetris:
     def __init__(self):
         self.running = True
         self.pause = False
+        self.grid = Grid()
         self.piece = Piece()
         self.piece_movement = pygame.Vector2()
         self.rotate = False
@@ -173,6 +196,7 @@ class Tetris:
                 # TODO gestion deplacement extremis, disable on the floor
                 # TODO extremis rotate
                 # TODO enregistrement de l emplacement dans la grille
+                self.grid.update(self.piece)
                 # TODO check les Tetris
                 # TODO check GameOver
                 # TODO nouvelle piece
@@ -186,6 +210,7 @@ class Tetris:
     
     def draw(self):
         screen.fill(BLACK) # couleur fond
+        self.grid.draw()
         self.piece.draw() # affiche la piece
         if DEBUG_MODE:
             self.draw_grid() # affiche une grille des cases               
