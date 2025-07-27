@@ -17,8 +17,6 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
-
-
 # liste des textes
 FONT_SIZE = 30
 FONT = pygame.font.SysFont('Arial', FONT_SIZE)
@@ -127,20 +125,26 @@ class Piece:
         if self.rotation >= len(self.shape):
             self.rotation = 0
     
-    def is_valid_position(self, movement):
+    def is_valid_position(self, grid, movement):
         for dx, dy in self.shape[self.rotation]:
             x = int(self.position.x + dx + movement.x)
             y = int(self.position.y + dy + movement.y)
+            print(f"position: {x} {y}")
+            print(f"current row: {grid[x]}")
+            
             if x < 0 or x >= GRID_WIDTH: # largeur
                 return False
-            if y >= GRID_HEIGHT: # touche le sol ou une autre piece en axe y, au second tic, on verouille la piece et on envoi une nouvelle
+            elif y >= GRID_HEIGHT: # touche le sol ou une autre piece en axe y, au second tic, on verouille la piece et on envoi une nouvelle
                 self.on_the_floor = True
                 return False
+            elif y > 0 and grid[x][y] != None:
+                self.on_the_floor = True
+                return False
+            
         return True
 
     def move(self, movement):
-        if self.is_valid_position(movement):
-            self.position += pygame.Vector2(movement.x, movement.y)
+        self.position += pygame.Vector2(movement.x, movement.y)
         
     def draw(self):
         for dx, dy in self.shape[self.rotation]:
@@ -202,7 +206,8 @@ class Tetris:
                 # TODO nouvelle piece
                 self.piece = Piece()
             else:
-                self.piece.move(self.piece_movement)  # mise a jour de la position
+                if self.piece.is_valid_position(self.grid.grid, self.piece_movement):
+                    self.piece.move(self.piece_movement)  # mise a jour de la position
                 if self.rotate:
                     self.piece.rotate()
         self.piece_movement = pygame.Vector2(0, 0)
