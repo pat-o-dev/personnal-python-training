@@ -68,7 +68,8 @@ SHAPE_SR = [
     [(0,1), (1,0), (1,1), (2,0)],   # 90
 ]
 
-SHAPES = [SHAPE_L, SHAPE_LR, SHAPE_T, SHAPE_I, SHAPE_O, SHAPE_S, SHAPE_SR]
+#SHAPES = [SHAPE_L, SHAPE_LR, SHAPE_T, SHAPE_I, SHAPE_O, SHAPE_S, SHAPE_SR]
+SHAPES = [SHAPE_I]
 SHAPES_COLORS = [RED, BLUE, GREEN]
 # position depart nouvelle piece
 SPAWN = pygame.Vector2(4, -3)
@@ -86,21 +87,30 @@ class Grid:
     def __init__(self):
         # enregistre la grille None ou Couleur
         self.grid = []
-        rows, cols = (GRID_WIDTH, GRID_HEIGHT)
-        for i in range(rows):
-            self.grid.append([None]*cols)
+        self.num_cols, self.num_rows = GRID_WIDTH, GRID_HEIGHT
+        for y in range(self.num_rows):
+            row = [None] * self.num_cols
+            self.grid.append(row)
     
+    def check(self):
+        # recherche si une ligne est pleine
+        for y in range(self.num_rows):
+            tetris = True
+            for x in range(self.num_cols):
+                tetris &= (self.grid[y][x] != None)
+            if tetris:
+                print(f"current row {y} is tetris")
+        pass
+        
     def update(self, piece):
-        pos_x = piece.position.x
-        pos_y = piece.position.y
-        for dx, dy in piece.shape[piece.rotation]:
-            id_x = int(pos_x + dx)
-            id_y = int(pos_y + dy)
-            self.grid[id_x][id_y] = piece.color
+        for dx, dy in piece.get_current_shape():
+            id_x = int(piece.position.x + dx)
+            id_y = int(piece.position.y + dy)
+            self.grid[id_y][id_x] = piece.color
     
     def draw(self):
-        for x, row in enumerate(self.grid):
-            for y, value in enumerate(row):
+        for y, row in enumerate(self.grid):
+            for x, value in enumerate(row):
                 if value != None:
                     pygame.draw.rect(
                         screen, 
@@ -121,6 +131,9 @@ class Piece:
         self.position = pygame.Vector2(SPAWN.x, SPAWN.y)
         self.color = random.choice(SHAPES_COLORS)
     
+    def get_current_shape(self):
+        return self.shape[self.rotation]
+    
     def rotate(self):
         self.rotation += 1
         if self.rotation >= len(self.shape):
@@ -135,7 +148,7 @@ class Piece:
             elif y >= GRID_HEIGHT: # touche le sol ou une autre piece en axe y, au second tic, on verouille la piece et on envoi une nouvelle
                 self.on_the_floor = True
                 return False
-            elif y > 0 and grid[x][y] != None: # touche un piece de la grille
+            elif y > 0 and grid[y][x] != None: # touche un piece de la grille
                 self.on_the_floor = True
                 return False
         #self.on_the_floor = False # on passe a false en cas de mouvement possible   
@@ -192,15 +205,14 @@ class Tetris:
                 self.move_down_timer = 0
                 self.piece_movement.y += 1
             if self.piece.on_the_floor: # si la piece est au sol et que un tick ou le control down a ete press, on verouille la piece
-                # TODO gestion deplacement extremis, disable on the floor
                 # TODO extremis rotate
                 self.grid.update(self.piece) # enregistrement de l emplacement dans la grille
                 # TODO check les Tetris
+                self.grid.check()
                 # TODO check GameOver
                 if self.piece.position.y <= 0 and self.piece.is_valid_position(self.grid.grid, self.piece_movement) == False:
                     self.gameover = True
                 else:
-                    print(f"{self.piece.position}")
                     self.piece = Piece() # nouvelle piece
             else:
                 if self.piece.is_valid_position(self.grid.grid, self.piece_movement):
@@ -228,6 +240,7 @@ class Tetris:
                 pos_x = grid_x * BLOC_SIZE
                 pos_y = grid_y * BLOC_SIZE
                 pygame.draw.rect(screen, WHITE, (pos_x, pos_y, pos_x + BLOC_SIZE, pos_y + BLOC_SIZE), 1)
+                
     def draw_pause(self):
         screen.blit(TEXT_PAUSE, ((WINDOW_WIDTH - TEXT_PAUSE.get_width()) / 2,(WINDOW_HEIGHT - TEXT_PAUSE.get_height()) / 2))
 
