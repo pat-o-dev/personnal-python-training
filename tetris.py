@@ -99,8 +99,8 @@ class Grid:
             for x in range(self.num_cols):
                 tetris &= (self.grid[y][x] != None)
             if tetris:
-                print(f"current row {y} is tetris")
-        pass
+                self.grid.pop(y)
+                self.grid.insert(0, [None] * self.num_cols)
         
     def update(self, piece):
         for dx, dy in piece.get_current_shape():
