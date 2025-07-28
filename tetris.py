@@ -5,7 +5,7 @@ import random
 pygame.init()
 pygame.font.init()
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 FPS = 60
 
