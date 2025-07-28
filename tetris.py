@@ -68,8 +68,7 @@ SHAPE_SR = [
     [(0,1), (1,0), (1,1), (2,0)],   # 90
 ]
 
-#SHAPES = [SHAPE_L, SHAPE_LR, SHAPE_T, SHAPE_I, SHAPE_O, SHAPE_S, SHAPE_SR]
-SHAPES = [SHAPE_I]
+SHAPES = [SHAPE_L, SHAPE_LR, SHAPE_T, SHAPE_I, SHAPE_O, SHAPE_S, SHAPE_SR]
 SHAPES_COLORS = [RED, BLUE, GREEN]
 # position depart nouvelle piece
 SPAWN = pygame.Vector2(4, -3)
@@ -93,8 +92,7 @@ class Grid:
             self.grid.append(row)
     
     def check(self):
-        # recherche si une ligne est pleine
-        for y in range(self.num_rows):
+        for y in range(self.num_rows): # recherche si une ligne est pleine
             tetris = True
             for x in range(self.num_cols):
                 tetris &= (self.grid[y][x] != None)
@@ -207,9 +205,9 @@ class Tetris:
             if self.piece.on_the_floor: # si la piece est au sol et que un tick ou le control down a ete press, on verouille la piece
                 # TODO extremis rotate
                 self.grid.update(self.piece) # enregistrement de l emplacement dans la grille
-                # TODO check les Tetris
+                # check les Tetris
                 self.grid.check()
-                # TODO check GameOver
+                # check GameOver
                 if self.piece.position.y <= 0 and self.piece.is_valid_position(self.grid.grid, self.piece_movement) == False:
                     self.gameover = True
                 else:
