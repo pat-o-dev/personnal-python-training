@@ -21,6 +21,7 @@ BLUE = (0, 0, 255)
 FONT_SIZE = 30
 FONT = pygame.font.SysFont('Arial', FONT_SIZE)
 TEXT_PAUSE = FONT.render("Pause", True, WHITE, GRAY_ALPHA)
+TEXT_GAMEOVER = FONT.render("Game Over", True, WHITE, GRAY_ALPHA)
 
 # taille de la grille
 GRID_WIDTH, GRID_HEIGHT = 10, 20
@@ -30,7 +31,7 @@ BLOC_SIZE = 30
 WINDOW_WIDTH = GRID_WIDTH * BLOC_SIZE
 WINDOW_HEIGHT = GRID_HEIGHT * BLOC_SIZE
 
-# liste des formes
+# liste des formes, les variantes ont ete cree par IA sauf pour SHAPE_L
 SHAPE_L = [
     [(0,0), (0,1), (0,2), (1,2)], # 0 0deg
     [(0,0), (0,1), (1,0), (2,0)], # 1 90deg
@@ -61,8 +62,6 @@ SHAPE_O = [
 SHAPE_S = [
     [(0,1), (0,2), (1,0), (1,1)],   # 0
     [(0,0), (1,0), (1,1), (2,1)],   # 90
-    [(0,1), (0,2), (1,0), (1,1)],   # 0
-    [(0,0), (1,0), (1,1), (2,1)],   # 90
 ]
 SHAPE_SR = [
     [(0,0), (0,1), (1,1), (1,2)],   # 0
@@ -85,7 +84,7 @@ CONTROL_NEW = [pygame.K_n]
    
 class Grid:
     def __init__(self):
-        # enregistre la grille None ou Code Couleur
+        # enregistre la grille None ou Couleur
         self.grid = []
         rows, cols = (GRID_WIDTH, GRID_HEIGHT)
         for i in range(rows):
@@ -103,9 +102,11 @@ class Grid:
         for x, row in enumerate(self.grid):
             for y, value in enumerate(row):
                 if value != None:
-                    pos_x = x * BLOC_SIZE
-                    pos_y = y * BLOC_SIZE
-                    pygame.draw.rect(screen, value, (pos_x, pos_y, BLOC_SIZE, BLOC_SIZE))
+                    pygame.draw.rect(
+                        screen, 
+                        value,
+                        (x * BLOC_SIZE, y * BLOC_SIZE, BLOC_SIZE, BLOC_SIZE)
+                    )
    
 class Piece:
     def __init__(self, force_shape=None):
@@ -134,10 +135,10 @@ class Piece:
             elif y >= GRID_HEIGHT: # touche le sol ou une autre piece en axe y, au second tic, on verouille la piece et on envoi une nouvelle
                 self.on_the_floor = True
                 return False
-            elif y > 0 and grid[x][y] != None:
+            elif y > 0 and grid[x][y] != None: # touche un piece de la grille
                 self.on_the_floor = True
                 return False
-            
+        #self.on_the_floor = False # on passe a false en cas de mouvement possible   
         return True
 
     def move(self, movement):
@@ -155,6 +156,7 @@ class Tetris:
     def __init__(self):
         self.running = True
         self.pause = False
+        self.gameover = False
         self.grid = Grid()
         self.piece = Piece()
         self.piece_movement = pygame.Vector2()
@@ -184,18 +186,22 @@ class Tetris:
                     self.rotate = True
     
     def update(self, delta):
-        if self.pause == False:
+        if self.pause == False and self.gameover == False:
             self.move_down_timer += delta # recupere le temps passe - change selon le FPS reel
             if self.move_down_timer > self.move_down_interval:
                 self.move_down_timer = 0
                 self.piece_movement.y += 1
-            if self.piece.on_the_floor and self.piece_movement.y > 0: # si la piece est au sol et que un tick ou le control down a ete press, on verouille la piece
+            if self.piece.on_the_floor: # si la piece est au sol et que un tick ou le control down a ete press, on verouille la piece
                 # TODO gestion deplacement extremis, disable on the floor
                 # TODO extremis rotate
                 self.grid.update(self.piece) # enregistrement de l emplacement dans la grille
                 # TODO check les Tetris
                 # TODO check GameOver
-                self.piece = Piece() # nouvelle piece
+                if self.piece.position.y <= 0 and self.piece.is_valid_position(self.grid.grid, self.piece_movement) == False:
+                    self.gameover = True
+                else:
+                    print(f"{self.piece.position}")
+                    self.piece = Piece() # nouvelle piece
             else:
                 if self.piece.is_valid_position(self.grid.grid, self.piece_movement):
                     self.piece.move(self.piece_movement)  # mise a jour de la position
@@ -212,6 +218,8 @@ class Tetris:
             self.draw_grid() # affiche une grille des cases               
         if self.pause == True:
             self.draw_pause() # affiche la pause
+        if self.gameover:
+            self.draw_gameover()
         pygame.display.flip() # mise a jour rendu
         
     def draw_grid(self):
@@ -220,12 +228,18 @@ class Tetris:
                 pos_x = grid_x * BLOC_SIZE
                 pos_y = grid_y * BLOC_SIZE
                 pygame.draw.rect(screen, WHITE, (pos_x, pos_y, pos_x + BLOC_SIZE, pos_y + BLOC_SIZE), 1)
-
     def draw_pause(self):
         screen.blit(TEXT_PAUSE, ((WINDOW_WIDTH - TEXT_PAUSE.get_width()) / 2,(WINDOW_HEIGHT - TEXT_PAUSE.get_height()) / 2))
 
+    def draw_gameover(self):
+        screen.blit(TEXT_GAMEOVER, ((WINDOW_WIDTH - TEXT_GAMEOVER.get_width()) / 2,(WINDOW_HEIGHT - TEXT_GAMEOVER.get_height()) / 2))
 
-def main():
+# init window
+screen = pygame.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
+pygame.display.set_caption("Tetris")
+
+# execute la mainloop pygame
+if __name__ == "__main__":
     clock = pygame.time.Clock()
     game = Tetris()
     while game.running:
@@ -234,11 +248,3 @@ def main():
         game.update(delta) # mise a jour des donnees
         game.draw() # affichage
     pygame.quit()
-
-# init window
-screen = pygame.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
-pygame.display.set_caption("Tetris")
-
-# execute la mainloop pygame
-if __name__ == "__main__":
-    main()
