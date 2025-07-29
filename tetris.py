@@ -1,5 +1,6 @@
 # creation rapide d un Tetris basique avec pygame
 import pygame
+import numpy as np
 import random
 
 pygame.init()
@@ -85,11 +86,8 @@ CONTROL_NEW = [pygame.K_n]
 class Grid:
     def __init__(self):
         # enregistre la grille None ou Couleur
-        self.grid = []
         self.num_cols, self.num_rows = GRID_WIDTH, GRID_HEIGHT
-        for y in range(self.num_rows):
-            row = [None] * self.num_cols
-            self.grid.append(row)
+        self.grid = np.empty((self.num_rows, self.num_cols), dtype=object)
     
     def check(self):
         for y in range(self.num_rows): # recherche si une ligne est pleine
