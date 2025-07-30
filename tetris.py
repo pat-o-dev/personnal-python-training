@@ -33,6 +33,7 @@ WINDOW_WIDTH = GRID_WIDTH * BLOC_SIZE
 WINDOW_HEIGHT = GRID_HEIGHT * BLOC_SIZE
 
 # liste des formes, les variantes ont ete cree par IA sauf pour SHAPE_L
+# on utilise numpy afin de pratiquer
 SHAPE_L = [
     [(0,0), (0,1), (0,2), (1,2)], # 0 0deg
     [(0,0), (0,1), (1,0), (2,0)], # 1 90deg
