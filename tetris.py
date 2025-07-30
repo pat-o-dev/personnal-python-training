@@ -6,74 +6,77 @@ import random
 pygame.init()
 pygame.font.init()
 
-DEBUG_MODE = False
-
 FPS = 60
 
 # liste des couleurs
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GRAY_ALPHA = pygame.Color(128, 128, 128, 100)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
+COLOR_BLACK = (0, 0, 0)
+COLOR_WHITE = (255, 255, 255)
+COLOR_GRAY = (128, 128, 128)
+COLOR_RED = (255, 0, 0)
+COLOR_CYAN = (0, 255, 255)
+COLOR_ORANGE = (255, 128, 0)
+COLOR_GREEN = (0, 255, 0)
+COLOR_BLUE = (0, 0, 255)
+COLOR_PINK = (255, 0, 255)
+COLOR_VIOLET = (127, 0, 255)
+COLOR_BROWN = (102, 51, 0)
 
 # liste des textes
 FONT_SIZE = 30
 FONT = pygame.font.SysFont('Arial', FONT_SIZE)
-TEXT_PAUSE = FONT.render("Pause", True, WHITE, GRAY_ALPHA)
-TEXT_GAMEOVER = FONT.render("Game Over", True, WHITE, GRAY_ALPHA)
+TEXT_PAUSE = FONT.render("Pause", True, COLOR_WHITE, COLOR_GRAY)
+TEXT_GAMEOVER = FONT.render("Game Over", True, COLOR_WHITE, COLOR_GRAY)
 
 # taille de la grille
-GRID_WIDTH, GRID_HEIGHT = 10, 20
+GRID_HEIGHT = 20
+GRID_WIDTH = 10
 # taille d un bloc en px
 BLOC_SIZE = 30
 # calcul de la taille de la fenetre
-WINDOW_WIDTH = GRID_WIDTH * BLOC_SIZE
-WINDOW_HEIGHT = GRID_HEIGHT * BLOC_SIZE
+GUI_SIDE = 5
+GUI_TOP = 3
 
-# liste des formes, les variantes ont ete cree par IA sauf pour SHAPE_L
-# on utilise numpy afin de pratiquer
-SHAPE_L = [
-    [(0,0), (0,1), (0,2), (1,2)], # 0 0deg
-    [(0,0), (0,1), (1,0), (2,0)], # 1 90deg
-    [(0,0), (1,0), (1,1), (1,2)], # 2 180deg
-    [(2,0), (0,1), (1,1), (2,1)], # 3 270deg
-]
-SHAPE_LR = [
-    [(1,0), (1,1), (1,2), (0,2)],   # 0
-    [(0,0), (0,1), (1,1), (2,1)],   # 90
-    [(0,0), (1,0), (0,1), (0,2)],   # 180
-    [(0,0), (1,0), (2,0), (2,1)],   # 270
-]
-SHAPE_T = [
-    [(0,1), (1,0), (1,1), (1,2)],   # 0
-    [(0,0), (1,0), (1,1), (2,0)],   # 90
-    [(1,0), (1,1), (1,2), (2,1)],   # 180
-    [(0,1), (1,0), (1,1), (2,1)],   # 270
-]
-SHAPE_I = [
-    [(0,0), (1,0), (2,0), (3,0)],   # 0
-    [(1,0), (1,1), (1,2), (1,3)],  # 90
-    [(0,1), (1,1), (2,1), (3,1)],   # 180
-    [(2,0), (2,1), (2,2), (2,3)],  # 270
-]
-SHAPE_O = [
-    [(0,0), (0,1), (1,0), (1,1)],
-]
-SHAPE_S = [
-    [(0,1), (0,2), (1,0), (1,1)],   # 0
-    [(0,0), (1,0), (1,1), (2,1)],   # 90
-]
-SHAPE_SR = [
-    [(0,0), (0,1), (1,1), (1,2)],   # 0
-    [(0,1), (1,0), (1,1), (2,0)],   # 90
-]
+WINDOW_HEIGHT = (GRID_HEIGHT + GUI_TOP) * BLOC_SIZE
+WINDOW_WIDTH = (GRID_WIDTH + GUI_SIDE) * BLOC_SIZE
+
+# liste des formes, les variantes
+SHAPE_L = np.array([
+    [COLOR_RED, None],
+    [COLOR_RED, None],
+    [COLOR_RED, COLOR_RED],
+], dtype=object)
+SHAPE_LR = np.array([
+    [None, COLOR_VIOLET],
+    [None, COLOR_VIOLET],
+    [COLOR_VIOLET, COLOR_VIOLET],
+], dtype=object)
+SHAPE_T = np.array([
+    [COLOR_BROWN, COLOR_BROWN, COLOR_BROWN],
+    [None, COLOR_BROWN, None],
+], dtype=object)   
+SHAPE_I = np.array([
+    [COLOR_CYAN],
+    [COLOR_CYAN],
+    [COLOR_CYAN],
+    [COLOR_CYAN],
+], dtype=object)
+SHAPE_O = np.array([
+    [COLOR_BLUE, COLOR_BLUE],
+    [COLOR_BLUE, COLOR_BLUE],
+], dtype=object)
+SHAPE_S = np.array([
+    [None, COLOR_ORANGE, COLOR_ORANGE],
+    [COLOR_ORANGE, COLOR_ORANGE, None],
+], dtype=object)
+SHAPE_SR = np.array([
+    [COLOR_PINK, COLOR_PINK, None],
+    [None, COLOR_PINK, COLOR_PINK],
+], dtype=object)
 
 SHAPES = [SHAPE_L, SHAPE_LR, SHAPE_T, SHAPE_I, SHAPE_O, SHAPE_S, SHAPE_SR]
-SHAPES_COLORS = [RED, BLUE, GREEN]
+
 # position depart nouvelle piece
-SPAWN = pygame.Vector2(4, -3)
+SPAWN = pygame.Vector2(4, 4)
 
 # liste des touches
 CONTROL_PAUSE = [pygame.K_ESCAPE, pygame.K_p]
@@ -82,15 +85,16 @@ CONTROL_LEFT = [pygame.K_a, pygame.K_LEFT]
 CONTROL_RIGHT = [pygame.K_d, pygame.K_RIGHT]
 CONTROL_DOWN = [pygame.K_s, pygame.K_DOWN]
 CONTROL_ROTATE = [pygame.K_r, pygame.K_UP]
-CONTROL_NEW = [pygame.K_n]
    
 class Grid:
     def __init__(self):
         # enregistre la grille None ou Couleur
-        self.num_cols, self.num_rows = GRID_WIDTH, GRID_HEIGHT
-        self.grid = np.empty((self.num_rows, self.num_cols), dtype=object)
+        self.height, self.width = GRID_HEIGHT, GRID_WIDTH
+        self.grid = np.empty((self.height, self.width), dtype=object)
     
     def check(self):
+        pass
+        '''
         for y in range(self.num_rows): # recherche si une ligne est pleine
             tetris = True
             for x in range(self.num_cols):
@@ -98,6 +102,7 @@ class Grid:
             if tetris:
                 self.grid.pop(y)
                 self.grid.insert(0, [None] * self.num_cols)
+        '''
         
     def update(self, piece):
         for dx, dy in piece.get_current_shape():
@@ -116,28 +121,21 @@ class Grid:
                     )
    
 class Piece:
-    def __init__(self, force_shape=None):
-        self.rotation = 0
+    def __init__(self, shape):
         self.on_the_floor = False
-        if force_shape == None:
-            self.shape = random.choice(SHAPES)
-        elif force_shape in SHAPES:
-            self.shape = force_shape
-        else:
-            raise ValueError("Error: Shape not exist.") 
+        self.shape = shape
         self.position = pygame.Vector2(SPAWN.x, SPAWN.y)
-        self.color = random.choice(SHAPES_COLORS)
+        self.bloc_size = BLOC_SIZE
     
     def get_current_shape(self):
-        return self.shape[self.rotation]
+        return self.shape
     
     def rotate(self):
-        self.rotation += 1
-        if self.rotation >= len(self.shape):
-            self.rotation = 0
+        self.shape = np.rot90(self.shape)
     
     def is_valid_position(self, grid, movement):
-        for dx, dy in self.shape[self.rotation]:
+        '''
+        for dx, dy in self.shape:
             x = int(self.position.x + dx + movement.x)
             y = int(self.position.y + dy + movement.y)
             if x < 0 or x >= GRID_WIDTH: # largeur
@@ -149,18 +147,31 @@ class Piece:
                 self.on_the_floor = True
                 return False
         #self.on_the_floor = False # on passe a false en cas de mouvement possible   
+        '''
         return True
 
     def move(self, movement):
         self.position += pygame.Vector2(movement.x, movement.y)
         
     def draw(self):
-        for dx, dy in self.shape[self.rotation]:
-            pygame.draw.rect(
-                screen,
-                self.color,
-                ((self.position.x + dx) * BLOC_SIZE, (self.position.y + dy) * BLOC_SIZE, BLOC_SIZE, BLOC_SIZE)
-            )
+        for y, x in np.ndindex(self.shape.shape): 
+            if self.shape[y, x] is not None:  # affiche un bloc lorsque une couleur de defini
+                pygame.draw.rect(
+                    screen,
+                    self.shape[y, x],  # Use RGB tuple from array
+                    (self.position[0] * self.bloc_size + x * self.bloc_size,
+                    self.position[1] * self.bloc_size + y * self.bloc_size,
+                    self.bloc_size, self.bloc_size,
+                    )
+                )
+                pygame.draw.rect(
+                    screen,
+                    COLOR_GRAY,
+                    (self.position[0] * self.bloc_size + x * self.bloc_size,
+                    self.position[1] * self.bloc_size + y * self.bloc_size,
+                    self.bloc_size, self.bloc_size),
+                    width=1  # 1px border
+                )
 
 class Tetris:
     def __init__(self):
@@ -168,7 +179,8 @@ class Tetris:
         self.pause = False
         self.gameover = False
         self.grid = Grid()
-        self.piece = Piece()
+        shape = random.choice(SHAPES)
+        self.piece = Piece(shape)
         self.piece_movement = pygame.Vector2()
         self.rotate = False
         self.move_down_timer = 0
@@ -184,8 +196,6 @@ class Tetris:
                     self.running = False
                 if key in CONTROL_PAUSE:# press ESCAPE pour pause
                     self.pause = not self.pause
-                if key in CONTROL_NEW and DEBUG_MODE:# pour debug, charge une nouvelle piece
-                    self.piece = Piece()
                 if key in CONTROL_LEFT:
                     self.piece_movement.x -= 1
                 if key in CONTROL_RIGHT:
@@ -210,7 +220,8 @@ class Tetris:
                 if self.piece.position.y <= 0 and self.piece.is_valid_position(self.grid.grid, self.piece_movement) == False:
                     self.gameover = True
                 else:
-                    self.piece = Piece() # nouvelle piece
+                    shape = random.choice(SHAPES)
+                    self.piece = Piece(shape) # nouvelle piece
             else:
                 if self.piece.is_valid_position(self.grid.grid, self.piece_movement):
                     self.piece.move(self.piece_movement)  # mise a jour de la position
@@ -220,11 +231,9 @@ class Tetris:
         self.rotate = False
     
     def draw(self):
-        screen.fill(BLACK) # couleur fond
+        screen.fill(COLOR_BLACK) # couleur fond
         self.grid.draw()
-        self.piece.draw() # affiche la piece
-        if DEBUG_MODE:
-            self.draw_grid() # affiche une grille des cases               
+        self.piece.draw() # affiche la piece             
         if self.pause == True:
             self.draw_pause() # affiche la pause
         if self.gameover:
@@ -236,7 +245,7 @@ class Tetris:
             for grid_y in range(GRID_HEIGHT):
                 pos_x = grid_x * BLOC_SIZE
                 pos_y = grid_y * BLOC_SIZE
-                pygame.draw.rect(screen, WHITE, (pos_x, pos_y, pos_x + BLOC_SIZE, pos_y + BLOC_SIZE), 1)
+                pygame.draw.rect(screen, COLOR_WHITE, (pos_x, pos_y, pos_x + BLOC_SIZE, pos_y + BLOC_SIZE), 1)
                 
     def draw_pause(self):
         screen.blit(TEXT_PAUSE, ((WINDOW_WIDTH - TEXT_PAUSE.get_width()) / 2,(WINDOW_HEIGHT - TEXT_PAUSE.get_height()) / 2))
