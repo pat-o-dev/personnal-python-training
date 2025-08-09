@@ -1,0 +1,48 @@
+{
+    "graphics": {
+        "window_width": 800,
+        "window_height": 600,
+        "fps": 60
+    },
+    "controls": {
+        "move_left": "K_LEFT",
+        "move_right": "K_RIGHT",
+        "rotate": "K_UP",
+        "drop": "K_DOWN",
+        "pause": "K_P",
+        "quit": "K_ESC"
+    },
+    "game": {
+        "grid_height": 20,
+        "grid_width": 10,
+        "bloc_size": 30,
+        "title": "Tetris",
+        "revision": "2.01"
+    },
+    "colors": {
+        "black": [0, 0, 0],
+        "blue": [0, 0, 255],
+        "pink": [255, 0, 255],
+        "red": [255, 0 ,0],
+        "white": [255, 255, 255]
+    },
+    "shapes": {
+        "L":{
+            "color": "red",
+            "shape": [
+                [1, 0],
+                [1, 0],
+                [1, 1]
+            ]
+        },
+        "I":{
+            "color": "blue",
+            "shape": [
+                [1, 0],
+                [1, 0],
+                [1, 0],
+                [1, 0]
+            ]
+        }
+    }
+}
