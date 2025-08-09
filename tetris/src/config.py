@@ -34,9 +34,23 @@ class Config:
         return (f"{game.get("title")} {game.get("revision")}")
     
     def get_fps(self):
-        graphics = self.get_section("graphics")
-        return graphics.get("fps", 30)
+        return self.get_section("graphics").get("fps", 30)
     
     def get_display_mode(self):
         graphics = self.get_section("graphics")
         return [graphics.get("window_width", 800), graphics.get("window_height", 600)]
+    
+    def get_bloc_size(self):
+        return self.get_section("game").get("bloc_size")
+    
+    def get_grid_size(self):
+        game = self.get_section("game")
+        return [game.get("grid_width"), game.get("grid_height")]
+    
+    def get_grid_offset(self):
+        grid_size_width, grid_size_height = self.get_grid_size()
+        bloc_size = self.get_bloc_size()
+        display_size_width_px, display_size_height_px = self.get_display_mode()
+        offset_x = (display_size_width_px - grid_size_width * bloc_size) // 2
+        offset_y = (display_size_height_px - grid_size_height * bloc_size) // 2
+        return [offset_x, offset_y]

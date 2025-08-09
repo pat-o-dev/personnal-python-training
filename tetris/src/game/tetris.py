@@ -7,11 +7,12 @@ class Tetris:
         self.screen = screen
         self.config = config
         self.colors = config.get_colors()
-        self.grid = Grid()
+        self.grid = Grid(self.config)
         
     def update(self, delta):
         pass
     
     def draw(self):
         self.screen.fill(self.colors.get("black"))
+        self.grid.draw(self.screen)
         pygame.display.flip() 

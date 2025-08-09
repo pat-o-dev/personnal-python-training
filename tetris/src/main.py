@@ -13,7 +13,7 @@ if __name__ == "__main__":
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game.running = False
-
+                
         delta = clock.tick(config.get_fps())
         game.update(delta)
         game.draw()

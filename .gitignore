@@ -2,3 +2,4 @@
 .venv/
 tetris/src/__pycache__/
 tetris/src/game/__pycache__/
+tetris/src/utils/__pycache__/

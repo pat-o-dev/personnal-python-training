@@ -15,7 +15,7 @@
     "game": {
         "grid_height": 20,
         "grid_width": 10,
-        "bloc_size": 30,
+        "bloc_size": 25,
         "title": "Tetris",
         "revision": "2.01"
     },
