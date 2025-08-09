@@ -2,7 +2,6 @@ import pygame
 from config import Config
 from game import Tetris
 
-
 if __name__ == "__main__":
     config = Config() # charge les configurations
     pygame.init()
