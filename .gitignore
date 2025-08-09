@@ -1,2 +1,4 @@
 .vscode/
 .venv/
+tetris/src/__pycache__/
+tetris/src/game/__pycache__/
