@@ -17,7 +17,7 @@
         "grid_width": 10,
         "bloc_size": 25,
         "title": "Tetris",
-        "revision": "2.01"
+        "revision": "0.21"
     },
     "colors": {
         "black": [0, 0, 0],

@@ -29,6 +29,9 @@ class Config:
     def get_colors(self):
         return self.get_section("colors")
     
+    def get_shapes(self):
+        return self.get_section("shapes")
+        
     def get_caption(self):
         game = self.get_section("game")
         return (f"{game.get("title")} {game.get("revision")}")
