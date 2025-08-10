@@ -26,4 +26,4 @@ class Piece:
                     self.border_color, 
                     offset, 
                     self.border_width
-                    )
+                )

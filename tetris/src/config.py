@@ -50,6 +50,9 @@ class Config:
         game = self.get_section("game")
         return [game.get("grid_width"), game.get("grid_height")]
     
+    def get_pieces_preview_position(self):
+        return self.get_section("game").get("piece_preview_position")
+    
     def get_grid_offset(self):
         grid_size_width, grid_size_height = self.get_grid_size()
         bloc_size = self.get_bloc_size()

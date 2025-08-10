@@ -15,6 +15,7 @@
     "game": {
         "grid_height": 20,
         "grid_width": 10,
+        "piece_preview_position": [3, 1],
         "bloc_size": 25,
         "title": "Tetris",
         "revision": "0.21"
@@ -22,11 +23,25 @@
     "colors": {
         "black": [0, 0, 0],
         "blue": [0, 0, 255],
+        "brown": [102, 51, 0],
+        "cyan": [0, 255, 255],
+        "green": [0, 255, 0],
+        "orange": [255, 127, 0],
         "pink": [255, 0, 255],
         "red": [255, 0 ,0],
+        "violet": [127, 0, 255],
         "white": [255, 255, 255]
     },
     "shapes": {
+        "I":{
+            "color": "blue",
+            "shape": [
+                [1, 0],
+                [1, 0],
+                [1, 0],
+                [1, 0]
+            ]
+        },
         "L":{
             "color": "red",
             "shape": [
@@ -35,12 +50,42 @@
                 [1, 1]
             ]
         },
-        "I":{
-            "color": "blue",
+        "LR":{
+            "color": "brown",
+            "shape": [
+                [0, 1],
+                [0, 1],
+                [1, 1]
+            ]
+        },
+        "O":{
+            "color": "orange",
+            "shape": [
+                [1, 1],
+                [1, 1]
+            ]
+        },
+        "S":{
+            "color": "violet",
             "shape": [
                 [1, 0],
+                [1, 1],
+                [0, 1]
+            ]
+        },
+        "SR":{
+            "color": "cyan",
+            "shape": [
+                [0, 1],
+                [1, 1],
+                [1, 0]
+            ]
+        },
+        "T":{
+            "color": "pink",
+            "shape": [
                 [1, 0],
-                [1, 0],
+                [1, 1],
                 [1, 0]
             ]
         }
