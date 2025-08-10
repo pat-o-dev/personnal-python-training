@@ -5,12 +5,25 @@
         "fps": 60
     },
     "controls": {
-        "move_left": "K_LEFT",
-        "move_right": "K_RIGHT",
-        "rotate": "K_UP",
-        "drop": "K_DOWN",
-        "pause": "K_P",
-        "quit": "K_ESC"
+        "controller": "keyboard",
+        "key_mapping": {
+            "keyboard": {
+                "move_left": ["K_LEFT", "K_a"],
+                "move_right": ["K_RIGHT", "K_d"],
+                "rotate": ["K_UP", "K_w"],
+                "drop": ["K_DOWN", "K_s"],
+                "pause": "K_p",
+                "quit": ["K_ESCAPE"]
+            },
+            "gamepad": {
+                "move_left": ["BUTTON_DPAD_LEFT"],
+                "move_right": ["BUTTON_DPAD_RIGHT"],
+                "rotate": ["BUTTON_A"],
+                "drop": ["BUTTON_B"],
+                "pause": ["BUTTON_START"],
+                "quit": ["BUTTON_BACK"]
+            }
+        }
     },
     "game": {
         "grid_height": 20,
@@ -35,6 +48,7 @@
     "shapes": {
         "I":{
             "color": "blue",
+            "border_color": "black",
             "shape": [
                 [1, 0],
                 [1, 0],
@@ -44,6 +58,7 @@
         },
         "L":{
             "color": "red",
+            "border_color": "black",
             "shape": [
                 [1, 0],
                 [1, 0],
@@ -52,6 +67,7 @@
         },
         "LR":{
             "color": "brown",
+            "border_color": "black",
             "shape": [
                 [0, 1],
                 [0, 1],
@@ -60,6 +76,7 @@
         },
         "O":{
             "color": "orange",
+            "border_color": "black",
             "shape": [
                 [1, 1],
                 [1, 1]
@@ -67,6 +84,7 @@
         },
         "S":{
             "color": "violet",
+            "border_color": "black",
             "shape": [
                 [1, 0],
                 [1, 1],
@@ -75,6 +93,7 @@
         },
         "SR":{
             "color": "cyan",
+            "border_color": "black",
             "shape": [
                 [0, 1],
                 [1, 1],
@@ -83,6 +102,7 @@
         },
         "T":{
             "color": "pink",
+            "border_color": "black",
             "shape": [
                 [1, 0],
                 [1, 1],

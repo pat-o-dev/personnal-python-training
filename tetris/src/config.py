@@ -60,3 +60,9 @@ class Config:
         offset_x = (display_size_width_px - grid_size_width * bloc_size) // 2
         offset_y = (display_size_height_px - grid_size_height * bloc_size) // 2
         return [offset_x, offset_y]
+    
+    def get_controller(self):
+        return self.get_section("controls").get("controller")
+    
+    def get_control_map(self, controller):
+        return self.get_section("controls").get("key_mapping").get(controller)

@@ -12,8 +12,9 @@ class Piece:
         self.active = active
         self.bloc_size = bloc_size
     
-    def update(self):
-        pass
+    def update(self, movement):
+        self.position += movement
+        #print(f"current position: {self.position}")
     
     def draw(self, screen, offset):
         for y, x in np.ndindex(self.shape.shape):
@@ -21,7 +22,7 @@ class Piece:
                 draw_cell(
                     screen, 
                     self.color, 
-                    pygame.Vector2(x, y), 
+                    pygame.Vector2(self.position.x + x, self.position.y + y), 
                     self.bloc_size, 
                     self.border_color, 
                     offset, 
