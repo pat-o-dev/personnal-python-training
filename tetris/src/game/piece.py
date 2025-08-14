@@ -12,7 +12,9 @@ class Piece:
         self.active = active
         self.bloc_size = bloc_size
     
-    def update(self, movement):
+    def update(self, movement, rotate):
+        if rotate is True:
+            self.shape = np.rot90(self.shape)
         self.position += movement
         #print(f"current position: {self.position}")
     

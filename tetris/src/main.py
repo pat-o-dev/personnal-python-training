@@ -13,11 +13,11 @@ if __name__ == "__main__":
     controls = Controls(config)
     fps = config.get_fps()
     while game.running:
+        delta = clock.tick(fps)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game.running = False
-            actions = controls.handle_event(event)             
-        delta = clock.tick(fps)
+            actions = controls.handle_event(event, delta)             
         game.update(actions, delta)
         game.draw()
     pygame.quit()

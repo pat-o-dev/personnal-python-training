@@ -66,3 +66,9 @@ class Config:
     
     def get_control_map(self, controller):
         return self.get_section("controls").get("key_mapping").get(controller)
+    
+    def get_move_down_interval(self):
+        return self.get_section("game").get("move_down_interval")
+    
+    def get_action_interval(self):
+        return self.get_section("game").get("action_interval")

@@ -2,7 +2,7 @@
     "graphics": {
         "window_width": 800,
         "window_height": 600,
-        "fps": 60
+        "fps": 20
     },
     "controls": {
         "controller": "keyboard",
@@ -31,7 +31,9 @@
         "piece_preview_position": [3, 1],
         "bloc_size": 25,
         "title": "Tetris",
-        "revision": "0.21"
+        "revision": "0.21",
+        "action_interval": 100,
+        "move_down_interval": 500
     },
     "colors": {
         "black": [0, 0, 0],

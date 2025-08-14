@@ -14,7 +14,7 @@ class Tetris:
         self.shapes = config.get_shapes()
         self.pieces = [self.get_random_piece() for _ in range(5)]
         self.move_down_timer = 0
-        self.move_down_interval = 500 #ms
+        self.move_down_interval = config.get_move_down_interval()#ms
     
     def get_random_piece(self):
         shape_idx = random.choice(list(self.shapes.keys()))
@@ -31,6 +31,7 @@ class Tetris:
     
     def update(self, actions, delta):
         piece_movement = pygame.Vector2(0, 0)
+        piece_rotate = False
         if "move_left" in actions:
             piece_movement.x -=1
         if "move_right" in actions:
@@ -38,7 +39,7 @@ class Tetris:
         if "drop" in actions:
             piece_movement.y += 1
         if "rotate" in actions:
-            #todo rotate
+            piece_rotate = True
             pass
         if "pause" in actions:
             #todo pause
@@ -51,7 +52,8 @@ class Tetris:
         if self.move_down_timer > self.move_down_interval: # drop timer
             self.move_down_timer = 0
             piece_movement.y = 1 # on ne descend jamais de 2 donc pas +=
-        self.pieces[0].update(piece_movement) # deplace la piece
+        self.pieces[0].update(piece_movement, piece_rotate) # deplace la piece  
+        
     
     def draw(self):
         self.screen.fill(self.colors.get("black"))
