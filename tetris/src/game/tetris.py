@@ -45,15 +45,17 @@ class Tetris:
             #todo pause
             pass
         if "quit" in actions:
-            #todo quit
+            self.running = False
             pass
         
         self.move_down_timer += delta
         if self.move_down_timer > self.move_down_interval: # drop timer
             self.move_down_timer = 0
             piece_movement.y = 1 # on ne descend jamais de 2 donc pas +=
-        self.pieces[0].update(piece_movement, piece_rotate) # deplace la piece  
         
+        piece_move = self.pieces[0].update(self.grid, piece_movement, piece_rotate) # deplace la piece  
+        if piece_move is False and self.pieces[0].is_lock is True:
+            self.next_piece()
     
     def draw(self):
         self.screen.fill(self.colors.get("black"))

@@ -4,7 +4,7 @@ class Controls:
     def __init__(self, config):
         self.key_map = {}
         self.cooldowns = {}  # cooldown restant par touche
-        self.delay = 150  # ms entre actions
+        self.delay = 50  # ms entre actions
         self.controller = config.get_controller()
         key_map = config.get_control_map(self.controller)
         for action, keys in key_map.items():
