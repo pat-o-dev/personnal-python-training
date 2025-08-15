@@ -11,6 +11,12 @@ class Grid:
         self.color = color
         self.border_color = border_color
         self.border_width = 1
+    
+    def save(self, piece):
+        grid_x, grid_y = int(piece.position.x), int(piece.position.y)
+        for y, x in np.ndindex(piece.shape.shape):
+            if piece.shape[y, x] == 1:
+                self.grid[grid_y+y, grid_x+x] = piece.color
         
     def draw(self, screen):
         for y, row in enumerate(self.grid):

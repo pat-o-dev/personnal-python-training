@@ -26,6 +26,7 @@ class Tetris:
         return Piece(shape, color, position, self.bloc_size, border_color)
     
     def next_piece(self):
+        self.grid.save(self.pieces[0])
         self.pieces.pop(0)
         self.pieces.append(self.get_random_piece())
     
